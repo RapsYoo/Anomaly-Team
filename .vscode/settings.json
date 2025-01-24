@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Project-NaturaCode.sln"
+    "dotnet.defaultSolution": "Anomaly-Team.sln"
 }

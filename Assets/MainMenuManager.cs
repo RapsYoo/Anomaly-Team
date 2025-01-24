@@ -5,9 +5,6 @@ public class MainMenuManager : MonoBehaviour
 {
     public void NewGame()
     {
-        PlayerPrefs.SetFloat("InGame_PosX", 0f);
-        PlayerPrefs.SetFloat("InGame_PosY", 0f);
-
         PlayerPrefs.SetFloat("InGameSea_X", 0f);
         PlayerPrefs.SetFloat("InGameSea_Y", 0f);
 
@@ -17,7 +14,7 @@ public class MainMenuManager : MonoBehaviour
 
         Debug.Log("New game data created and saved.");
 
-        SceneManager.LoadScene("InGame"); 
+        SceneManager.LoadScene("InGameSea"); 
     }
 
     public void Play()
@@ -25,7 +22,7 @@ public class MainMenuManager : MonoBehaviour
         if (PlayerPrefs.HasKey("InGame_PosX") || PlayerPrefs.HasKey("Gold"))
         {
             Debug.Log("Loading saved game...");
-            SceneManager.LoadScene("InGame"); 
+            SceneManager.LoadScene("InGameSea"); 
         }
         else
         {

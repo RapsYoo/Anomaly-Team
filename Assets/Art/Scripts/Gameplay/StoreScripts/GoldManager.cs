@@ -48,8 +48,8 @@ public class GoldManager : MonoBehaviour
 
     private void UpdateGoldText()
     {
-        goldText.text = "Gold: " + gold.ToString();
-        goldTextUI.text = "Gold: " + gold.ToString();
+        goldText.text = "Exp: " + gold.ToString();
+        goldTextUI.text = "Exp: " + gold.ToString();
     }
 
     private IEnumerator ShowWarningTemporary(string message, float delay)
