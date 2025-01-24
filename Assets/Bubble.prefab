@@ -161,5 +161,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf3dbeb81cf998642ba0f69ecd2098f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  oxygenBoost: 25
+  oxygenBoost: 10
   lifetime: 4

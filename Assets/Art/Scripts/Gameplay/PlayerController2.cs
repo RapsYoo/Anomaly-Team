@@ -113,7 +113,7 @@ public class PlayerController2 : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, 1f); // Visual radius tangkapan
+        Gizmos.DrawWireSphere(transform.position, 1f); 
     }
 
     public void Stun(float duration)
@@ -132,7 +132,7 @@ public class PlayerController2 : MonoBehaviour
         isStunned = false;
     }
 
-    private void OnApplicationQuit()
+    private void OnDisable()
     {
         // Simpan posisi pemain untuk scene "InGameSea" sebelum keluar
         PlayerPrefs.SetFloat("InGameSea_X", transform.position.x);
