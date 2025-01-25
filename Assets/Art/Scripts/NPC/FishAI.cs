@@ -5,25 +5,33 @@ using UnityEngine;
 public class FishAI : MonoBehaviour
 {
     [Header("Player Interaction")]
-    public Transform player; 
-    public float fleeRadius = 3f; 
-    public float fleeSpeed = 4f; 
+    public Transform player;
+    public float fleeRadius = 3f;
+    public float baseFleeSpeed = 4f; 
 
     [Header("Normal Behavior")]
-    public float normalSpeed = 2f; 
-    public float directionChangeInterval = 2f; 
+    public float normalSpeed = 2f;
+    public float directionChangeInterval = 2f;
 
-    private BoxCollider2D boundaryCollider; 
-    private Vector2 targetDirection; 
-    private Rigidbody2D rb; 
-    private Animator animator; 
+    private BoxCollider2D boundaryCollider;
+    private Vector2 targetDirection;
+    private Rigidbody2D rb;
+    private Animator animator;
+    private GoldManager goldManager; 
+    private float fleeSpeed; 
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        fleeSpeed = baseFleeSpeed; 
 
-        // cari objek player secara otomatis jika belum diatur
+        goldManager = FindObjectOfType<GoldManager>();
+        if (goldManager == null)
+        {
+            Debug.LogWarning("GoldManager tidak ditemukan! Pastikan ada script GoldManager di scene.");
+        }
+
         if (player == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -37,7 +45,6 @@ public class FishAI : MonoBehaviour
             }
         }
 
-        // cari collider dengan tag "Boundary"
         GameObject boundaryObj = GameObject.FindGameObjectWithTag("Boundary");
         if (boundaryObj != null)
         {
@@ -52,25 +59,22 @@ public class FishAI : MonoBehaviour
             Debug.LogWarning("Boundary tidak ditemukan! Pastikan ada objek dengan tag 'Boundary' di scene.");
         }
 
-        // Mulai rutinitas perubahan arah
         StartCoroutine(ChangeDirectionRoutine());
     }
 
     void FixedUpdate()
     {
-        if (player != null) // Pastikan player tidak null
+        if (player != null) 
         {
             float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
             if (distanceToPlayer < fleeRadius)
             {
-                // Aktifkan animasi flee
                 animator.SetBool("isFleeing", true);
                 FleeFromPlayer();
             }
             else
             {
-                // Matikan animasi flee (kembali ke idle)
                 animator.SetBool("isFleeing", false);
                 MoveInRandomDirection();
             }
@@ -82,16 +86,17 @@ public class FishAI : MonoBehaviour
         }
 
         RestrictMovementWithinBoundary();
+        UpdateFleeSpeed(); 
     }
 
     void FleeFromPlayer()
     {
-        if (player != null) // Pastikan player tidak null
+        if (player != null) 
         {
             Vector2 fleeDirection = ((Vector2)transform.position - (Vector2)player.position).normalized;
             rb.velocity = fleeDirection * fleeSpeed;
 
-            // Perbarui arah ikan berdasarkan arah flee
+
             UpdateFishDirection(fleeDirection);
         }
     }
@@ -100,7 +105,6 @@ public class FishAI : MonoBehaviour
     {
         rb.velocity = targetDirection * normalSpeed;
 
-        // Perbarui arah ikan berdasarkan gerakan acak
         UpdateFishDirection(targetDirection);
     }
 
@@ -139,7 +143,6 @@ public class FishAI : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        // Visualisasi radius menjauh
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, fleeRadius);
 
@@ -152,17 +155,24 @@ public class FishAI : MonoBehaviour
 
     void UpdateFishDirection(Vector2 movementDirection)
     {
-        Vector3 currentScale = transform.localScale; // Ambil skala saat ini
+        Vector3 currentScale = transform.localScale; 
 
         if (movementDirection.x > 0)
         {
-            // Menghadap kanan (pastikan X positif)
             transform.localScale = new Vector3(Mathf.Abs(currentScale.x), currentScale.y, currentScale.z);
         }
         else if (movementDirection.x < 0)
         {
-            // Menghadap kiri (pastikan X negatif)
             transform.localScale = new Vector3(-Mathf.Abs(currentScale.x), currentScale.y, currentScale.z);
+        }
+    }
+
+    void UpdateFleeSpeed()
+    {
+        if (goldManager != null)
+        {
+            int gold = goldManager.GetGold();
+            fleeSpeed = baseFleeSpeed + (gold / 100) * 0.5f; 
         }
     }
 }

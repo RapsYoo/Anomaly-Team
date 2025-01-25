@@ -21,6 +21,9 @@ public class WaterSurfaceDetector : MonoBehaviour
     private bool isOxygenDepleted = false;
     private Coroutine oxygenDepletedCoroutine;
 
+    [SerializeField] private AudioClip oxygenAddSFX; // Tambahkan AudioClip untuk SFX
+    private AudioSource audioSource;
+
     void Start()
     {
         currentOxygen = maxOxygen;
@@ -28,6 +31,12 @@ public class WaterSurfaceDetector : MonoBehaviour
         goldManager = FindObjectOfType<GoldManager>();
         countdownText.text = "";
         gameOverScreen.SetActive(false);
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            Debug.LogError("AudioSource tidak ditemukan pada GameObject ini.");
+        }
     }
 
     void Update()
@@ -68,6 +77,31 @@ public class WaterSurfaceDetector : MonoBehaviour
         }
 
         oxygenSlider.value = currentOxygen;
+    }
+
+    public void AddOxygen(float amount)
+    {
+        currentOxygen += amount;
+        if (currentOxygen > maxOxygen)
+        {
+            currentOxygen = maxOxygen;
+        }
+        UpdateOxygenSlider();
+        Debug.Log($"Oksigen bertambah sebanyak {amount}. Total oksigen sekarang: {currentOxygen}");
+
+        PlayOxygenAddSFX(); // Mainkan SFX ketika oksigen bertambah
+    }
+
+    private void PlayOxygenAddSFX()
+    {
+        if (audioSource != null && oxygenAddSFX != null)
+        {
+            audioSource.PlayOneShot(oxygenAddSFX);
+        }
+        else
+        {
+            Debug.LogWarning("SFX oksigen tidak diatur atau AudioSource tidak ditemukan.");
+        }
     }
 
     public void RespawnPlayer()
@@ -169,17 +203,6 @@ public class WaterSurfaceDetector : MonoBehaviour
         countdownText.text = "";
         Time.timeScale = 0;
         gameOverScreen.SetActive(true);
-    }
-
-    public void AddOxygen(float amount)
-    {
-        currentOxygen += amount;
-        if (currentOxygen > maxOxygen)
-        {
-            currentOxygen = maxOxygen;
-        }
-        UpdateOxygenSlider();
-        Debug.Log($"Oksigen bertambah sebanyak {amount}. Total oksigen sekarang: {currentOxygen}");
     }
 
     private IEnumerator ShowWarningTemporary(string message, float delay)

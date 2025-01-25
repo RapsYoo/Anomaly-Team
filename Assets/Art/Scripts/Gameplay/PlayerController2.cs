@@ -4,19 +4,25 @@ using UnityEngine;
 public class PlayerController2 : MonoBehaviour
 {
     [SerializeField] private float speed = 5f;
+    [SerializeField] private float boostMultiplier = 2f; // Multiplier for the speed boost
     [SerializeField] private Animator anime;
+    [SerializeField] private AudioClip catchFishSFX;
+    [SerializeField] private AudioClip stunSFX;
+    [SerializeField] private AudioClip moveSFX;
 
     private Vector2 movement;
     private Rigidbody2D rb;
+    private AudioSource audioSource;
+    private AudioSource moveAudioSource;
 
     private GoldManager goldManager;
     private bool isStunned = false;
+    private bool isBoosting = false; // Track if the player is boosting
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
 
-        // Load posisi pemain untuk scene "InGameSea" jika tersedia
         if (PlayerPrefs.HasKey("InGameSea_X") && PlayerPrefs.HasKey("InGameSea_Y"))
         {
             float x = PlayerPrefs.GetFloat("InGameSea_X");
@@ -29,6 +35,17 @@ public class PlayerController2 : MonoBehaviour
         {
             Debug.LogError("GoldManager tidak ditemukan");
         }
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            Debug.LogError("AudioSource tidak ditemukan di GameObject ini!");
+        }
+
+        moveAudioSource = gameObject.AddComponent<AudioSource>();
+        moveAudioSource.clip = moveSFX;
+        moveAudioSource.loop = true;
+        moveAudioSource.playOnAwake = false;
     }
 
     private void Update()
@@ -38,7 +55,11 @@ public class PlayerController2 : MonoBehaviour
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
+        HandleMovementSFX();
         FlipAnimation();
+
+        // Check if the right mouse button is being held
+        isBoosting = Input.GetMouseButton(1);
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -51,14 +72,35 @@ public class PlayerController2 : MonoBehaviour
         if (movement != Vector2.zero)
         {
             rb.gravityScale = 0;
-            rb.velocity = movement.normalized * speed * Time.deltaTime;
+
+            // Apply boost multiplier if boosting
+            float currentSpeed = isBoosting ? speed * boostMultiplier : speed;
+
+            rb.velocity = movement.normalized * currentSpeed * Time.deltaTime;
         }
         else
         {
             rb.velocity = Vector2.zero;
             rb.gravityScale = 10;
         }
+    }
 
+    private void HandleMovementSFX()
+    {
+        if (movement != Vector2.zero)
+        {
+            if (!moveAudioSource.isPlaying)
+            {
+                moveAudioSource.Play();
+            }
+        }
+        else
+        {
+            if (moveAudioSource.isPlaying)
+            {
+                moveAudioSource.Stop();
+            }
+        }
     }
 
     private void FlipAnimation()
@@ -101,10 +143,15 @@ public class PlayerController2 : MonoBehaviour
             {
                 if (goldManager != null)
                 {
-                    goldManager.ChangeGold(10); // Tambah 10 gold
+                    goldManager.ChangeGold(10);
                 }
 
-                Destroy(obj.gameObject); // Hancurkan ikan
+                if (audioSource != null && catchFishSFX != null)
+                {
+                    audioSource.PlayOneShot(catchFishSFX);
+                }
+
+                Destroy(obj.gameObject);
                 break;
             }
         }
@@ -113,11 +160,16 @@ public class PlayerController2 : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, 1f); 
+        Gizmos.DrawWireSphere(transform.position, 1f);
     }
 
     public void Stun(float duration)
     {
+        if (audioSource != null && stunSFX != null)
+        {
+            audioSource.PlayOneShot(stunSFX);
+        }
+
         StartCoroutine(StunCoroutine(duration));
     }
 
@@ -125,6 +177,12 @@ public class PlayerController2 : MonoBehaviour
     {
         Debug.Log("Player stunned!");
         isStunned = true;
+
+        // Hentikan suara gerakan saat stun
+        if (moveAudioSource.isPlaying)
+        {
+            moveAudioSource.Stop();
+        }
 
         yield return new WaitForSeconds(duration);
 
@@ -134,7 +192,6 @@ public class PlayerController2 : MonoBehaviour
 
     private void OnDisable()
     {
-        // Simpan posisi pemain untuk scene "InGameSea" sebelum keluar
         PlayerPrefs.SetFloat("InGameSea_X", transform.position.x);
         PlayerPrefs.SetFloat("InGameSea_Y", transform.position.y);
         PlayerPrefs.Save();
