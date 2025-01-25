@@ -8,7 +8,8 @@ public class BubbleSpawner : MonoBehaviour
     public Transform waterSurface; 
     public int maxBubbles = 10; 
     public float spawnInterval = 3f; 
-    public Vector2 spawnOffsetRange = new Vector2(-10f, 10f); 
+    public Vector2 spawnOffsetRange = new Vector2(-5f, 5f); 
+    public int bubblesPerSpawn = 4; 
 
     private void Start()
     {
@@ -22,25 +23,30 @@ public class BubbleSpawner : MonoBehaviour
             yield return new WaitForSeconds(spawnInterval);
 
             int currentBubbleCount = GameObject.FindGameObjectsWithTag("Bubble").Length;
-            if (currentBubbleCount < maxBubbles)
+            int bubblesToSpawn = Mathf.Min(bubblesPerSpawn, maxBubbles - currentBubbleCount);
+
+            if (bubblesToSpawn > 0)
             {
-                SpawnBubble();
+                SpawnBubbles(bubblesToSpawn);
             }
         }
     }
 
-    private void SpawnBubble()
+    private void SpawnBubbles(int count)
     {
         if (bubblePrefab != null && waterSurface != null)
         {
-            Vector3 randomPosition = waterSurface.position + new Vector3(
-                Random.Range(spawnOffsetRange.x, spawnOffsetRange.y), 
-                Random.Range(0, spawnOffsetRange.y),                 
-                0
-            );
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 randomPosition = waterSurface.position + new Vector3(
+                    Random.Range(spawnOffsetRange.x, spawnOffsetRange.y), 
+                    Random.Range(0, spawnOffsetRange.y),                 
+                    0
+                );
 
-            GameObject newBubble = Instantiate(bubblePrefab, randomPosition, Quaternion.identity);
-            newBubble.tag = "Bubble"; 
+                GameObject newBubble = Instantiate(bubblePrefab, randomPosition, Quaternion.identity);
+                newBubble.tag = "Bubble"; 
+            }
         }
     }
 }

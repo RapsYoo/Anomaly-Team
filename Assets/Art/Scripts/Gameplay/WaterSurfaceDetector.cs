@@ -21,8 +21,19 @@ public class WaterSurfaceDetector : MonoBehaviour
     private bool isOxygenDepleted = false;
     private Coroutine oxygenDepletedCoroutine;
 
-    [SerializeField] private AudioClip oxygenAddSFX; // Tambahkan AudioClip untuk SFX
+    [SerializeField] private AudioClip oxygenAddSFX; 
     private AudioSource audioSource;
+
+    // Boost Speed Variables
+    [SerializeField] private float maxBoostPower = 6f; 
+    [SerializeField] private float boostRegenRate = 1f; 
+    [SerializeField] private float oxygenDepletionMultiplier = 2f; 
+    [SerializeField] private UnityEngine.UI.Slider boostPowerSlider; 
+    private float currentBoostPower; 
+    private bool isBoosting = false; 
+    [SerializeField] private float boostMultiplier = 2f; 
+
+    private Rigidbody2D rb;
 
     void Start()
     {
@@ -32,26 +43,78 @@ public class WaterSurfaceDetector : MonoBehaviour
         countdownText.text = "";
         gameOverScreen.SetActive(false);
 
+        currentBoostPower = maxBoostPower;
+        if (boostPowerSlider != null)
+        {
+            boostPowerSlider.maxValue = maxBoostPower;
+            boostPowerSlider.value = currentBoostPower;
+        }
+
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
             Debug.LogError("AudioSource tidak ditemukan pada GameObject ini.");
         }
+
+        rb = GetComponent<Rigidbody2D>();
+        if (rb == null)
+        {
+            Debug.LogError("Rigidbody2D tidak ditemukan pada GameObject ini.");
+        }
     }
 
     void Update()
     {
+        if (Input.GetMouseButton(1)) 
+        {
+            isBoosting = true;
+
+            if (currentBoostPower > 0)
+            {
+                currentBoostPower -= Time.deltaTime;
+                if (currentBoostPower < 0)
+                {
+                    currentBoostPower = 0;
+                }
+                rb.velocity *= boostMultiplier; 
+            }
+            else
+            {
+                if (isUnderwater)
+                {
+                    currentOxygen -= oxygenRate * oxygenDepletionMultiplier * Time.deltaTime;
+                    if (currentOxygen < 0)
+                    {
+                        currentOxygen = 0;
+                    }
+                }
+            }
+        }
+        else
+        {
+            isBoosting = false;
+
+            if (currentBoostPower < maxBoostPower)
+            {
+                currentBoostPower += boostRegenRate * Time.deltaTime;
+                if (currentBoostPower > maxBoostPower)
+                {
+                    currentBoostPower = maxBoostPower;
+                }
+            }
+        }
+
+        if (boostPowerSlider != null)
+        {
+            boostPowerSlider.value = currentBoostPower;
+        }
+
         if (isUnderwater)
         {
             currentOxygen -= oxygenRate * Time.deltaTime;
-            if (currentOxygen <= 0)
+            if (currentOxygen < 0)
             {
                 currentOxygen = 0;
-                if (!isOxygenDepleted)
-                {
-                    isOxygenDepleted = true;
-                    oxygenDepletedCoroutine = StartCoroutine(HandleOxygenDepletionCountdown());
-                }
             }
         }
         else
@@ -64,19 +127,15 @@ public class WaterSurfaceDetector : MonoBehaviour
                     currentOxygen = maxOxygen;
                 }
             }
-
-            if (isOxygenDepleted)
-            {
-                isOxygenDepleted = false;
-                if (oxygenDepletedCoroutine != null)
-                {
-                    StopCoroutine(oxygenDepletedCoroutine);
-                    countdownText.text = "";
-                }
-            }
         }
 
-        oxygenSlider.value = currentOxygen;
+        if (currentOxygen <= 0 && !isOxygenDepleted)
+        {
+            isOxygenDepleted = true;
+            oxygenDepletedCoroutine = StartCoroutine(HandleOxygenDepletionCountdown());
+        }
+
+        UpdateOxygenSlider();
     }
 
     public void AddOxygen(float amount)
@@ -89,7 +148,7 @@ public class WaterSurfaceDetector : MonoBehaviour
         UpdateOxygenSlider();
         Debug.Log($"Oksigen bertambah sebanyak {amount}. Total oksigen sekarang: {currentOxygen}");
 
-        PlayOxygenAddSFX(); // Mainkan SFX ketika oksigen bertambah
+        PlayOxygenAddSFX(); 
     }
 
     private void PlayOxygenAddSFX()
@@ -156,6 +215,7 @@ public class WaterSurfaceDetector : MonoBehaviour
         }
 
         currentOxygen = maxOxygen;
+        currentBoostPower = maxBoostPower;
         isOxygenDepleted = false;
         UpdateOxygenSlider();
     }

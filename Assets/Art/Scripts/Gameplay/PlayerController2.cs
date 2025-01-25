@@ -4,7 +4,7 @@ using UnityEngine;
 public class PlayerController2 : MonoBehaviour
 {
     [SerializeField] private float speed = 5f;
-    [SerializeField] private float boostMultiplier = 2f; // Multiplier for the speed boost
+    [SerializeField] private float boostMultiplier = 2f; 
     [SerializeField] private Animator anime;
     [SerializeField] private AudioClip catchFishSFX;
     [SerializeField] private AudioClip stunSFX;
@@ -17,7 +17,7 @@ public class PlayerController2 : MonoBehaviour
 
     private GoldManager goldManager;
     private bool isStunned = false;
-    private bool isBoosting = false; // Track if the player is boosting
+    private bool isBoosting = false; 
 
     private void Start()
     {
@@ -58,7 +58,6 @@ public class PlayerController2 : MonoBehaviour
         HandleMovementSFX();
         FlipAnimation();
 
-        // Check if the right mouse button is being held
         isBoosting = Input.GetMouseButton(1);
 
         if (Input.GetMouseButtonDown(0))
@@ -73,7 +72,6 @@ public class PlayerController2 : MonoBehaviour
         {
             rb.gravityScale = 0;
 
-            // Apply boost multiplier if boosting
             float currentSpeed = isBoosting ? speed * boostMultiplier : speed;
 
             rb.velocity = movement.normalized * currentSpeed * Time.deltaTime;
@@ -178,7 +176,6 @@ public class PlayerController2 : MonoBehaviour
         Debug.Log("Player stunned!");
         isStunned = true;
 
-        // Hentikan suara gerakan saat stun
         if (moveAudioSource.isPlaying)
         {
             moveAudioSource.Stop();

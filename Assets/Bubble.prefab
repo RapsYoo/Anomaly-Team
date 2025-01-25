@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3611413308568514855}
   - component: {fileID: 7831667978979202990}
   - component: {fileID: 289633701209622287}
+  - component: {fileID: 14233675700197966}
   m_Layer: 0
   m_Name: Bubble
   m_TagString: Bubble
@@ -29,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 1802587159929649588}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.7074292, w: 0.70678425}
-  m_LocalPosition: {x: 8.44, y: -3.57, z: 11.955215}
+  m_LocalPosition: {x: 8.44, y: -3.57, z: 11.95522}
   m_LocalScale: {x: 0.5846, y: 0.5631, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -163,3 +164,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   oxygenBoost: 10
   lifetime: 4
+--- !u!95 &14233675700197966
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802587159929649588}
+  m_Enabled: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: bec1c936549a27246a05b2160e63bfa3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
