@@ -1,6 +1,6 @@
-# Ocean Guardian
+# Diving Frenzy
 
-**Ocean Guardian** is an engaging and immersive ocean-themed game where players take on the role of a guardian of the seas, protecting marine life and preserving the ocean's beauty. 
+**Diving Frenzy** is an engaging and immersive ocean-themed game where players take on the role of a guardian of the seas, protecting marine life and preserving the ocean's beauty. 
 
 ## Table of Contents
 - [Features](#features)
@@ -23,7 +23,7 @@
 - Stunning graphics and sound effects.
 
 ## Installation
-To get started with **Ocean Guardian**, follow these steps:
+To get started with **Diving Frenzy**, follow these steps:
 
 1. Clone the repository:
    ```bash
