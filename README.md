@@ -27,6 +27,6 @@ To get started with **Diving Frenzy**, follow these steps:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Natura-Code/Project-NaturaCode.git
+   https://github.com/RapsYoo/Anomaly-Team.git
    
 
